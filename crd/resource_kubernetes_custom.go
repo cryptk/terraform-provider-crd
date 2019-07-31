@@ -64,7 +64,7 @@ func resourceCRDCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCRDRead(d *schema.ResourceData, meta interface{}) error {
-	conn := meta.(*dynamic.Clientset)
+	conn := meta.(*dynamic.NewForConfig)
 
 	group := d.Get("group")
 	version := d.Get("version")
@@ -81,7 +81,7 @@ func resourceCRDRead(d *schema.ResourceData, meta interface{}) error {
 	dyn, err := conn.Resource(dynamicResource).Namespace(namespace.(string)).Get(name, metav1.GetOptions{})
 	if err != nil {
 		log.Printf("[DEBUG] Received error: %#v", err)
-		return fmt.ErrorF("Failed to read dynamic resource '%s' because: %s", dyn.ObjectMeta, err)
+		return fmt.Errorf("Failed to read dynamic resource '%s' because: %s", dyn.ObjectMeta, err)
 	}
 	return nil
 }
