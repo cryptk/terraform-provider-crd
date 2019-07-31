@@ -9,6 +9,7 @@ import (
 
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/clientcmd"
+	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 )
 
 func Provider() terraform.ResourceProvider {
@@ -32,11 +33,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 
 	var err error
 
-	// try loading config file
-	fmt.Printf("Connecting to Kubernetes Context %v\n", context)
-
 	loader := clientcmd.NewDefaultClientConfigLoadingRules()
-
 	overrides := &clientcmd.ConfigOverrides{}
 
 	ctx, ctxOk := d.GetOk("config_context")
