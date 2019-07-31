@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/crainte/terraform-provider-istio/istio"
+	"github.com/crainte/terraform-provider-crd/crd"
 	"github.com/hashicorp/terraform/plugin"
 )
 
