@@ -78,10 +78,10 @@ func resourceCRDRead(d *schema.ResourceData, meta interface{}) error {
 		Resource: resource.(string),
 	}
 
-	dyn, err := conn.Resource(dynamicResource).Namespace(namespace.(string)).Get(name, metav1.GetOptions{})
+	dyn, err := conn.Resource(dynamicResource).Namespace(namespace.(string)).Get(name.(string), metav1.GetOptions{})
 	if err != nil {
 		log.Printf("[DEBUG] Received error: %#v", err)
-		return fmt.Errorf("Failed to read dynamic resource '%s' because: %s", dyn.ObjectMeta, err)
+		return fmt.Errorf("Failed to read dynamic resource '%s' because: %s", dyn, err)
 	}
 	return nil
 }
