@@ -8,6 +8,8 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 
 	"k8s.io/client-go/dynamic"
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 )
@@ -31,6 +33,7 @@ func Provider() terraform.ResourceProvider {
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 
+	var cfg *restclient.Config
 	var err error
 
 	loader := clientcmd.NewDefaultClientConfigLoadingRules()
