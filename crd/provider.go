@@ -47,7 +47,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	}
 
 	cc := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loader, overrides)
-	cfg, err := cc.ClientConfig()
+	cfg, err = cc.ClientConfig()
 	if err != nil {
 		return nil, fmt.Errorf("Failed to load config: %s", err)
 	}

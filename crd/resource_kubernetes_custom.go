@@ -64,7 +64,7 @@ func resourceCRDCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCRDRead(d *schema.ResourceData, meta interface{}) error {
-	conn := meta.(*dynamic.Interface)
+	conn := meta.(dynamic.Interface)
 
 	group := d.Get("group")
 	version := d.Get("version")
