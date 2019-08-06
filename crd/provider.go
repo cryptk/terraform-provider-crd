@@ -24,7 +24,7 @@ func Provider() terraform.ResourceProvider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"kubernetes_custom": resourceKubernetesCustom(),
+			"crd_yaml": resourceCRD(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{},
 		ConfigureFunc:  providerConfigure,
