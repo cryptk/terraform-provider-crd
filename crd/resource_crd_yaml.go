@@ -80,7 +80,7 @@ func resourceCRDCreate(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Failed to create dynamic resource '%s' because: %s", buildId(un), err)
 	}
 	log.Printf("[INFO] Submitted new resource: %#v", out)
-	d.SetId(buildId(out))
+	d.SetId(buildId(un))
 
 	return resourceCRDRead(d, meta)
 }
@@ -109,7 +109,7 @@ func resourceCRDRead(d *schema.ResourceData, meta interface{}) error {
 	out, err := conn.Resource(dynamicResource).Namespace(namespace).Get(name, metav1.GetOptions{})
 	if err != nil {
 		log.Printf("[DEBUG] Received error: %#v", err)
-		return fmt.Errorf("Failed to read dynamic resource '%s' because: %s", buildId(out), err)
+		return fmt.Errorf("Failed to read dynamic resource '%s' because: %s", out, err)
 	}
 	log.Printf("[INFO] Received resource: %#v", out)
 
@@ -157,7 +157,7 @@ func resourceCRDUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	conn := meta.(dynamic.Interface)
 
-	namespace, _, err := idParts(d.Id())
+	namespace, name, err := idParts(d.Id())
 	if err != nil {
 		return err
 	}
@@ -180,9 +180,13 @@ func resourceCRDUpdate(d *schema.ResourceData, meta interface{}) error {
 		Resource: resource,
 	}
 
-	out, err := conn.Resource(dynamicResource).Namespace(namespace).Update(un, metav1.UpdateOptions{})
+	// dynamic requires resource version to match
+	out, err := conn.Resource(dynamicResource).Namespace(namespace).Get(name, metav1.GetOptions{})
+	un.SetResourceVersion(out.GetResourceVersion())
+
+	out, err = conn.Resource(dynamicResource).Namespace(namespace).Update(un, metav1.UpdateOptions{})
 	if err != nil {
-		return fmt.Errorf("Failed to update dynamic resource '%s' because: %s", buildId(out), err)
+		return fmt.Errorf("Failed to update dynamic resource '%s' because: %s", buildId(un), err)
 	}
 	log.Printf("[INFO] Submitted updated resource: %#v", out)
 
