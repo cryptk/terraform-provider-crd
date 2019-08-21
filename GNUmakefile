@@ -6,6 +6,9 @@ PKG_NAME=crd
 default: build
 
 build: fmtcheck
+	CGO_ENABLED=0 go build -o build/bin/terraform-provider-crd
+
+install: fmtcheck
 	go install
 
 test: fmtcheck

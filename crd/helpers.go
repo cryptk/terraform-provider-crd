@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
@@ -21,19 +22,19 @@ func buildId(un *unstructured.Unstructured) string {
 	return un.GetNamespace() + "/" + un.GetName()
 }
 
-// helper function to convert YAML default type to JSON default type
-func cleanYAML(i interface{}) interface{} {
-	switch x := i.(type) {
-	case map[interface{}]interface{}:
-		m2 := map[string]interface{}{}
-		for k, v := range x {
-			m2[k.(string)] = cleanYAML(v)
+func ResourceExists(available []*metav1.APIResourceList, resource unstructured.Unstructured) (*metav1.APIResource, bool) {
+	for _, rList := range available {
+		if rList == nil {
+			continue
 		}
-		return m2
-	case []interface{}:
-		for i, v := range x {
-			x[i] = cleanYAML(v)
+		group := rList.GroupVersion
+		for _, r := range rList.APIResources {
+			if group == resource.GroupVersionKind().GroupVersion().String() && r.Kind == resource.GetKind() {
+				r.Group = rList.GroupVersion
+				r.Kind = rList.Kind
+				return &r, true
+			}
 		}
 	}
-	return i
+	return nil, false
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 
 	"k8s.io/client-go/dynamic"
+	kubernetes "k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -29,6 +30,11 @@ func Provider() terraform.ResourceProvider {
 		DataSourcesMap: map[string]*schema.Resource{},
 		ConfigureFunc:  providerConfigure,
 	}
+}
+
+type KubeClientSet struct {
+	Dynamic dynamic.Interface
+	Main    *kubernetes.Clientset
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
@@ -57,10 +63,15 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	// Overriding with static configuration
 	cfg.UserAgent = fmt.Sprintf("HashiCorp/1.0 Terraform/%s", terraform.VersionString())
 
-	k, err := dynamic.NewForConfig(cfg)
+	dyn, err := dynamic.NewForConfig(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to configure: %s", err)
 	}
 
-	return k, nil
+	kub, err := kubernetes.NewForConfig(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to configure: %s", err)
+	}
+
+	return &KubeClientSet{dyn, kub}, nil
 }
